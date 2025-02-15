@@ -1,0 +1,224 @@
+January 11, 2025 :
+
+Git Installation and Setup with GitHub :
+Install Git:
+Open the terminal and execute the following commands to install Git and verify the version installed:
+
+$ sudo apt update  
+$ sudo apt install git  
+$ git --version  
+Example output:
+git version 2.43.0
+
+
+Git SSH Setup with GitHub :
+1. Generate a New SSH Key:
+Open the terminal and execute the following command:
+
+$ ssh-keygen -t ed25519 -C "harshalbhoyar14@example.com"  
+This generates a new public/private SSH key pair.
+When prompted, press Enter to accept the default file location.
+
+2. Add Your SSH Key to the SSH-Agent:
+   Start the SSH agent in the background:
+
+$ eval "$(ssh-agent -s)"  
+Example output:
+Agent pid 7353  
+
+3. Add your SSH private key to the SSH agent:
+   $ ssh-add ~/.ssh/id_ed25519  
+
+Copy the SSH Key:
+Open the public SSH key file:
+
+$ cat ~/.ssh/id_ed25519.pub  
+Copy the content displayed.
+
+Add the SSH Key to Your GitHub Account:
+Go to your GitHub account and follow these steps:
+Click on your profile picture > Settings > SSH and GPG Keys.
+Under SSH Keys, click New SSH Key.
+Provide a title (e.g., "My Laptop SSH Key") and paste the copied key content in the Key field.
+Click Add SSH Key to save the changes.
+
+
+Setting Up Git
+After ensuring Git is installed, configure it with your name and email address to embed your information into each commit:
+
+Execute the following commands:
+bash
+Copy code
+$ git config --global user.name "Harshal Bhoyar"  
+$ git config --global user.email "harshalbhoyar14@gmail.com"  
+$ git config --list  
+Example output:
+css
+Copy code
+user.name=Harshal Bhoyar  
+user.email=harshalbhoyar14@gmail.com  
+By completing the above steps, your Git and GitHub setup is ready. You can now start creating and managing your repositories!
+
+================================================================================================================================================
+
+January 12, 2025: 
+
+Jenkins Password : 7db1ca36b82a45ec90a9a3a7c85d47b2
+
+Jenkins Credentials :
+User : admin
+Password : Pass@123
+Email : harshalbhoyar14@gmail.com
+
+===========================================================================================================================
+
+Prerequisites to Install Jenkins on Ubuntu 24.04
+    1. Server Requirements:
+        ◦ A server running Ubuntu 24.04 OS.
+        ◦ A user with root or non-root privileges and sudo access.
+        ◦ At least 2 GB of RAM (e.g., NVMe 2 VPS plan).
+
+Step 1: Update the System
+Before installing any software, ensure your system's packages are up-to-date. Run the following command:
+
+sudo apt update -y && sudo apt upgrade -y
+
+Step 2: Install Java
+Jenkins requires Java to run. Install Java by executing:
+
+$ sudo apt install openjdk-21-jdk -y
+Once Java is installed, verify the installation using:
+
+$ java -version
+Expected output:
+root@host:~# java -version
+openjdk version "21.0.3" 2024-04-16
+OpenJDK Runtime Environment (build 21.0.3+9-Ubuntu-1ubuntu1)
+OpenJDK 64-Bit Server VM (build 21.0.3+9-Ubuntu-1ubuntu1, mixed mode, sharing)
+
+Step 3: Add Jenkins GPG Key and Repository
+    1. Add the Jenkins GPG key:
+
+       sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    2. Add the Jenkins repository to the sources list:
+       
+       echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+    3. Update the system package list again:
+       sudo apt update -y
+
+Step 4: Install Jenkins on Ubuntu 24.04
+    1. Install Jenkins by running:
+       sudo apt install jenkins -y
+    2. Start and enable the Jenkins service:
+       sudo systemctl start jenkins && sudo systemctl enable jenkins
+    3. Check the status of the Jenkins service:
+       sudo systemctl status jenkins
+Expected output:
+root@host:~# sudo systemctl status jenkins
+● jenkins.service - Jenkins Continuous Integration Server
+     Loaded: loaded (/usr/lib/systemd/system/jenkins.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2024-06-11 09:39:02 CDT; 15s ago
+   Main PID: 11666 (java)
+      Tasks: 52 (limit: 4613)
+     Memory: 1.1G (peak: 1.2G)
+        CPU: 1min 24.854s
+     CGroup: /system.slice/jenkins.service
+             └─11666 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war --httpPort=8080
+
+Jenkins is now installed and running on your server. Access it via your browser at:
+arduino
+Copy code
+http://<your-server-ip>:8080
+Replace <your-server-ip> with the actual IP address of your server.
+
+======================================================================================================================
+
+February 1, 2025 :
+
+Devops Project Workshop | Devops Project 2 (Udemy) :
+
+
+AWS CLI Installation : 
+How to Install AWS CLI in Ubuntu 24.04
+Follow these steps to install AWS CLI (v2) on Ubuntu 24.04:
+Step 1: Update Packages
+Update the package lists:
+sudo apt update && sudo apt upgrade -y
+Step 2: Install Required Dependencies
+Ensure necessary dependencies are installed:
+sudo apt install curl unzip -y
+Step 3: Download AWS CLI Installer
+Download the latest AWS CLI v2 installation script:
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+Step 4: Extract the ZIP File
+unzip awscliv2.zip
+Step 5: Run the Installation Script
+sudo ./aws/install
+Step 6: Verify Installation
+Check if AWS CLI is installed successfully:
+aws --version
+Expected Output (Example):
+aws-cli/2.x.x Linux/x86_64
+Step 7: Clean Up
+After installation, remove the downloaded files:
+rm -rf awscliv2.zip aws/
+Now, AWS CLI is successfully installed on Ubuntu 24.04. If needed, you can configure it using:
+aws configure
+
+================================================================================
+Terraform Installation :
+Terraform is an Infrastructure-as-Code (IaC) tool that allows you to manage cloud resources efficiently. Follow these steps to install Terraform on Ubuntu 24.04.
+
+Step 1: Update and Upgrade Your System
+Before installing Terraform, update your package lists and upgrade existing packages.
+bash
+CopyEdit
+sudo apt update && sudo apt upgrade -y
+
+Step 2: Install Required Dependencies
+Ensure that curl and gnupg are installed for fetching and verifying the Terraform package.
+bash
+CopyEdit
+sudo apt install -y curl gnupg software-properties-common
+
+Step 3: Add the HashiCorp GPG Key
+Terraform is provided by HashiCorp, so you need to add their GPG key to verify the package.
+bash
+CopyEdit
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo tee /etc/apt/trusted.gpg.d/hashicorp.asc
+
+Step 4: Add the HashiCorp Repository
+Next, add the HashiCorp repository to your system's package sources.
+bash
+CopyEdit
+sudo add-apt-repository "deb [signed-by=/etc/apt/trusted.gpg.d/hashicorp.asc] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
+Step 5: Install Terraform
+After adding the repository, update the package lists again and install Terraform.
+bash
+CopyEdit
+sudo apt update
+sudo apt install -y terraform
+
+Step 6: Verify the Installation
+Check if Terraform is installed correctly by running:
+bash
+CopyEdit
+terraform -v
+This should output the installed Terraform version.
+
+Step 7: Enable Tab Completion (Optional)
+Enable command-line autocompletion for Terraform:
+bash
+CopyEdit
+terraform -install-autocomplete
+
+Step 8: Initialize Terraform
+To verify that Terraform is working, create a new directory and initialize Terraform:
+bash
+CopyEdit
+mkdir terraform-test && cd terraform-test
+terraform init
+If this completes successfully, Terraform is installed and ready to use!
+================================================================================
+
