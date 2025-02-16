@@ -220,9 +220,6 @@ CopyEdit
 mkdir terraform-test && cd terraform-test
 terraform init
 If this completes successfully, Terraform is installed and ready to use!
-================================================================================
-
-
 
 ====================================================================================================
 
