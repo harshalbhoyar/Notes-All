@@ -219,6 +219,129 @@ bash
 CopyEdit
 mkdir terraform-test && cd terraform-test
 terraform init
-If this completes successfully, Terraform is installed and ready to use! ........
+If this completes successfully, Terraform is installed and ready to use!
 ================================================================================
+
+Github Personal access token (15th Feb, 2025):
+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
+
+====================================================================================================
+
+To set up AWS CLI from creating a user in IAM to configuring everything properly, follow these detailed steps:
+
+Step 1: Create an IAM User in AWS Console
+Log in to AWS Console
+Go to AWS Management Console and sign in.
+
+Open IAM (Identity and Access Management)
+
+In the AWS console, search for IAM and open it.
+Create a New User
+
+Click on Users > Add users.
+Enter a username (e.g., aws-cli-user).
+Under Access type, select:
+✅ Programmatic access (Required for AWS CLI access).
+Set Permissions
+
+Choose Attach policies directly.
+Attach the AdministratorAccess policy (or select specific permissions based on your needs).
+Review and Create User
+
+Click Create user.
+Copy the Access Key ID and Secret Access Key (or download the .csv file).
+Step 2: Install AWS CLI on Ubuntu 24.04
+1. Update System
+sh
+Copy
+Edit
+sudo apt update && sudo apt upgrade -y
+2. Install Dependencies
+sh
+Copy
+Edit
+sudo apt install curl unzip -y
+3. Download AWS CLI v2
+sh
+Copy
+Edit
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+4. Unzip the Installer
+sh
+Copy
+Edit
+unzip awscliv2.zip
+5. Install AWS CLI
+sh
+Copy
+Edit
+sudo ./aws/install
+6. Verify Installation
+sh
+Copy
+Edit
+aws --version
+Output should be similar to:
+
+bash
+Copy
+Edit
+aws-cli/2.x.x Python/x.x.x Linux/x86_64
+Step 3: Configure AWS CLI
+Now, configure AWS CLI using the IAM credentials.
+
+1. Run AWS Configure Command
+sh
+Copy
+Edit
+aws configure
+It will ask for:
+
+AWS Access Key ID: (Paste from IAM)
+AWS Secret Access Key: (Paste from IAM)
+Default region name: (e.g., us-east-1 or ap-south-1)
+Default output format: (json, table, or text)
+Step 4: Verify AWS CLI Setup
+Run the following command to check if AWS CLI is working:
+
+sh
+Copy
+Edit
+aws s3 ls
+If configured correctly, it will list your S3 buckets (if any exist).
+
+Step 5: Additional AWS CLI Setup (Optional)
+1. Create a Named Profile
+If you want to manage multiple AWS accounts, create a profile:
+
+sh
+Copy
+Edit
+aws configure --profile my-profile
+Use the profile with commands:
+
+sh
+Copy
+Edit
+aws s3 ls --profile my-profile
+2. Check IAM User Details
+sh
+Copy
+Edit
+aws sts get-caller-identity
+This will return the AWS Account ID, IAM User ARN, and User ID.
+
+3. List All Available AWS Services
+sh
+Copy
+Edit
+aws service-quotas list-services
+4. Check Configured Region
+sh
+Copy
+Edit
+aws configure get region
+
+
+===========================================================================================================
 
