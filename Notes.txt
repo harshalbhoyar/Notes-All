@@ -221,7 +221,7 @@ mkdir terraform-test && cd terraform-test
 terraform init
 If this completes successfully, Terraform is installed and ready to use!
 
-====================================================================================================
+=================================================================================================================
 
 To set up AWS CLI from creating a user in IAM to configuring everything properly, follow these detailed steps:
 
