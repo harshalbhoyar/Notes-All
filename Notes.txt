@@ -222,8 +222,7 @@ terraform init
 If this completes successfully, Terraform is installed and ready to use!
 ================================================================================
 
-Github Personal access token (15th Feb, 2025):
-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
+
 
 ====================================================================================================
 
