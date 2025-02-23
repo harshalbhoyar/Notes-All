@@ -341,3 +341,266 @@ aws configure get region
 
 ===========================================================================================================
 
+Step-by-Step Guide to Creating and Configuring an AWS EC2 Instance with Terraform
+Introduction
+This guide provides a step-by-step approach to creating and configuring an AWS EC2 instance using Terraform. It includes setting up the provider, defining network resources, and provisioning an EC2 instance.
+Step 1: Create a Terraform Configuration File
+Create a file named V2-EC2.tf and add the following content.
+Step 2: Configure the AWS Provider
+Define the required provider and specify the AWS region for resource provisioning.
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+Step 3: Define the AWS EC2 Instance
+Define the AWS EC2 instance along with its security group, key pair, and subnet.
+resource "aws_instance" "demo-server" {
+  ami                    = "ami-04b4f1a9cf54c11d0"
+  instance_type          = "t2.micro"
+  key_name               = "dpp"
+  vpc_security_group_ids = [aws_security_group.demo-sg.id]
+  subnet_id              = aws_subnet.dpp-public-subnet-01.id
+  for_each = toset(["jenkins-master", "build-slave", "ansible"])
+  tags = {
+    Name = "${each.key}"
+  }
+}
+Step 4: Create a Security Group
+Define a security group that allows SSH and HTTP access.
+resource "aws_security_group" "demo-sg" {
+  name        = "demo-sg"
+  description = "SSH Access"
+  vpc_id      = aws_vpc.dpp-vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "ssh-prot"
+  }
+}
+Step 5: Create a Virtual Private Cloud (VPC)
+Define a VPC with a specific CIDR block.
+resource "aws_vpc" "dpp-vpc" {
+  cidr_block = "10.1.0.0/16"
+  tags = {
+    Name = "dpp-vpc"
+  }
+}
+Step 6: Create Public Subnets
+Define two public subnets in different availability zones.
+resource "aws_subnet" "dpp-public-subnet-01" {
+  vpc_id                  = aws_vpc.dpp-vpc.id
+  cidr_block              = "10.1.1.0/24"
+  map_public_ip_on_launch = "true"
+  availability_zone       = "us-east-1a"
+  tags = {
+    Name = "dpp-public-subnet-01"
+  }
+}
+
+resource "aws_subnet" "dpp-public-subnet-02" {
+  vpc_id                  = aws_vpc.dpp-vpc.id
+  cidr_block              = "10.1.2.0/24"
+  map_public_ip_on_launch = "true"
+  availability_zone       = "us-east-1b"
+  tags = {
+    Name = "dpp-public-subnet-02"
+  }
+}
+Step 7: Create an Internet Gateway
+Attach an internet gateway to the VPC.
+resource "aws_internet_gateway" "dpp-igw" {
+  vpc_id = aws_vpc.dpp-vpc.id
+  tags = {
+    Name = "dpp-igw"
+  }
+}
+Step 8: Create a Route Table
+Define a route table to allow internet access for public subnets.
+resource "aws_route_table" "dpp-public-rt" {
+  vpc_id = aws_vpc.dpp-vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.dpp-igw.id
+  }
+}
+Step 9: Associate Route Table with Subnets
+Associate the route table with the public subnets to enable internet access.
+resource "aws_route_table_association" "dpp-rta-public-subnet-01" {
+  subnet_id      = aws_subnet.dpp-public-subnet-01.id
+  route_table_id = aws_route_table.dpp-public-rt.id
+}
+
+resource "aws_route_table_association" "dpp-rta-public-subnet-02" {
+  subnet_id      = aws_subnet.dpp-public-subnet-02.id
+  route_table_id = aws_route_table.dpp-public-rt.id
+}
+Conclusion
+This Terraform configuration sets up an AWS infrastructure with an EC2 instance, security groups, subnets, an internet gateway, and route tables. Once the configuration is complete, apply the Terraform script using:
+terraform init
+terraform apply
+
+
+
+
+V2-EC2.tf :
+# Configure the AWS Provider
+  terraform {
+    required_providers {
+      aws = {
+        source = "hashicorp/aws"
+      }
+    }
+  }
+
+  provider "aws" {
+    # Specifies the desired AWS region for resource provisioning dcdddv 
+    region = "us-east-1"
+  }
+
+
+  resource "aws_instance" "demo-server" {
+    ami                    = "ami-04b4f1a9cf54c11d0"
+    instance_type          = "t2.micro"
+    key_name               = "dpp"
+    vpc_security_group_ids = [aws_security_group.demo-sg.id]
+    subnet_id              = aws_subnet.dpp-public-subnet-01.id
+    #   security_groups = [aws_security_group.terraform-security-group.name]
+    for_each = toset(["jenkins-master", "build-slave", "ansible"])
+    tags = {
+      Name = "${each.key}"
+    }
+  }
+
+
+  resource "aws_security_group" "demo-sg" {
+    name        = "demo-sg"
+    description = "SSH Access"
+    vpc_id      = aws_vpc.dpp-vpc.id
+
+    #Incoming traffic
+    ingress {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address
+    }
+
+    #Outgoing traffic
+    egress {
+      from_port   = 0
+      protocol    = "-1"
+      to_port     = 0
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    #Incoming traffic
+    ingress {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address
+    }
+
+    #Outgoing traffic
+    egress {
+      from_port   = 0
+      protocol    = "-1"
+      to_port     = 0
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    tags = {
+      Name = "ssh-prot"
+    }
+
+  }
+
+  resource "aws_vpc" "dpp-vpc" {
+    cidr_block = "10.1.0.0/16"
+    tags = {
+      Name = "dpp-vpc"
+    }
+
+  }
+  resource "aws_subnet" "dpp-public-subnet-01" {
+    vpc_id                  = aws_vpc.dpp-vpc.id
+    cidr_block              = "10.1.1.0/24"
+    map_public_ip_on_launch = "true"
+    availability_zone       = "us-east-1a"
+    tags = {
+      Name = "dpp-public-subent-01"
+    }
+  }
+  resource "aws_subnet" "dpp-public-subnet-02" {
+    vpc_id                  = aws_vpc.dpp-vpc.id
+    cidr_block              = "10.1.2.0/24"
+    map_public_ip_on_launch = "true"
+    availability_zone       = "us-east-1b"
+    tags = {
+      Name = "dpp-public-subent-02"
+    }
+  }
+  resource "aws_internet_gateway" "dpp-igw" {
+    vpc_id = aws_vpc.dpp-vpc.id
+    tags = {
+      Name = "dpp-igw"
+    }
+  }
+  resource "aws_route_table" "dpp-public-rt" {
+    vpc_id = aws_vpc.dpp-vpc.id
+    route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.dpp-igw.id
+    }
+  }
+  resource "aws_route_table_association" "dpp-rta-public-subnet-01" {
+    subnet_id      = aws_subnet.dpp-public-subnet-01.id
+    route_table_id = aws_route_table.dpp-public-rt.id
+  }
+  resource "aws_route_table_association" "dpp-rta-public-subnet-02" {
+    subnet_id      = aws_subnet.dpp-public-subnet-02.id
+    route_table_id = aws_route_table.dpp-public-rt.id
+  }
+
+=======================================================================
+
+Ansible installation on Ubuntu 24.04 :
+$ sudo apt update
+$ sudo apt install software-properties-common
+$ sudo add-apt-repository --yes --update ppa:ansible/ansible
+$ sudo apt install ansible
+
+
+
+
+
+
+
+
