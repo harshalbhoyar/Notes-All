@@ -589,6 +589,11 @@ V2-EC2.tf :
     route_table_id = aws_route_table.dpp-public-rt.id
   }
 
+==============================================================================
+output "instance_public_ips" {
+  description = "Public IPs of the EC2 instances"
+  value       = { for instance in aws_instance.demo-server : instance.tags["Name"] => instance.public_ip }
+}
 =======================================================================
 
 Ansible installation on Ubuntu 24.04 :
@@ -607,10 +612,47 @@ sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ansible --version
-
+=======================================================================
+Use SCP to copy file from local to EC2:
+scp -i dpp.pem dpp.pem ubuntu@2.33.2332.233:/home/ubuntu
 =================================================================
 
+Ansible Hosts File Configuration :
+Steps to Create a Hosts File
+Step 1: Navigate to the Hosts Directory
+Run the following command to move to the /opt/hosts directory:
+cd /opt/hosts
+Step 2: Create and Edit the Hosts File
+Open the hosts file using Vim:
+vim hosts
+Step 3: Add the Following Content to the File
+[jenkins-master]
+10.1.1.65
 
+[jenkins-master:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=/opt/dpp.pem
+
+[jenkins-slave]
+10.1.1.36
+
+[jenkins-slave:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=/opt/dpp.pem
+Step 4: Save and Exit Vim
+    • Press Esc
+    • Type :wq
+    • Press Enter
+Additional Considerations
+    • Ensure that the /opt/dpp.pem file has the correct permissions:
+      chmod 400 /opt/dpp.pem
+    • Test Ansible connectivity to the nodes:
+      ansible all -m ping -i /opt/hosts/hosts
+      If successful, you should see a pong response from each host.
+    • If using multiple Ansible inventory files, specify the hosts file explicitly when running playbooks:
+      ansible-playbook -i /opt/hosts/hosts playbook.yml
+
+===============================================================================
 
 
 
