@@ -627,18 +627,20 @@ Open the hosts file using Vim:
 vim hosts
 Step 3: Add the Following Content to the File
 [jenkins-master]
-10.1.1.65
+10.1.1.14
 
 [jenkins-master:vars]
 ansible_user=ubuntu
 ansible_ssh_private_key_file=/opt/dpp.pem
 
 [jenkins-slave]
-10.1.1.36
+10.1.1.38
 
 [jenkins-slave:vars]
 ansible_user=ubuntu
 ansible_ssh_private_key_file=/opt/dpp.pem
+
+
 Step 4: Save and Exit Vim
     • Press Esc
     • Type :wq
@@ -652,7 +654,79 @@ Additional Considerations
     • If using multiple Ansible inventory files, specify the hosts file explicitly when running playbooks:
       ansible-playbook -i /opt/hosts/hosts playbook.yml
 
-===============================================================================
+===========================================================================================================================================
+
+Prevent SSH Disconnection Issue
+If your SSH session disconnects automatically after a few minutes, modify the SSH client and server settings:
+Client-Side Configuration
+Edit or create the SSH config file on your local machine:Prevent SSH Disconnection Issue
+If your SSH session disconnects automatically after a few minutes, modify the SSH client and server settings:
+Client-Side Configuration
+Edit or create the SSH config file on your local machine:
+vim ~/.ssh/config
+Add the following lines:
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+This will send a keep-alive packet every 60 seconds to prevent disconnection.
+Server-Side Configuration
+Edit the SSH daemon configuration on the EC2 instance:
+sudo vim /etc/ssh/sshd_config
+Find and modifysudo systemctl restart ssh (or add) the following lines:sudo systemctl restart ssh
+ClientAliveInterval 60
+ClientAliveCountMax 5
+Save the file and restart the SSH service:
+sudo service ssh restart
+If sshd is not found as a service, the correct command may be:
+sudo systemctl restart ssh 
+
+===============================================================================================================================================
+
+Create a playbook to install jenkins on jenkins-master :
+Playbook: jenkins-master-setup.yaml
+---
+- hosts: jenkins-master
+  become: true
+  tasks:
+  - name: add jenkins key
+    apt_key:
+      url: https://pkg.jenkins.io/debian/jenkins.io.key
+      state: present
+      
+  - name: add jenkins repo
+    apt_repository:
+      repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+      state: present
+
+  - name: install java
+    apt:
+      name: openjdk-21-jre
+      state: present
+
+  - name: install jenkins
+    apt:
+      name: jenkins
+      state: present
+
+  - name: start jenkins service
+    service:
+      name: jenkins
+      state: started
+      enabled: yes
+
+  
+Execution Steps
+    1. Save the playbook as jenkins-master-setup.yaml.
+    2. Run the playbook using the following command:
+       ansible-playbook -i /opt/hosts/hosts jenkins-master-setup.yaml
+Verification
+    • Check if Jenkins is running:
+      systemctl status jenkins
+    • Verify if Java is installed:
+      java -version
+
+
+
 
 
 
