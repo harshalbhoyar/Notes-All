@@ -765,8 +765,91 @@ Execution Steps
 
 =============================================================================================================================================================
 
+Now connect to Jenkins Master.
 
+Get the initial password by following these steps:
 
+Switch to the root user:
+
+sudo su -
+
+Navigate to the Jenkins secrets directory:
+
+cd /var/lib/jenkins/secrets/
+
+Retrieve the initial password:
+
+cat initialpassword
+
+Take this password and connect to Jenkins Master from the web interface using:
+
+URL: http://<public-ip>:8080
+
+Enter the retrieved initial password.
+
+After logging in, proceed with setting up a username and password for Jenkins:
+
+Username: admin
+
+Password: Admin@123
+
+Once completed, Jenkins is set up and ready to use.
+================================================================================================================================
+
+Setting Up Maven Credentials in Jenkins
+To configure Maven credentials in Jenkins, follow the steps below:
+    1. Access Jenkins Master:
+        ◦ Log in to the Jenkins master instance.
+    2. Navigate to Credentials Management:
+        ◦ Click on Manage Jenkins from the Jenkins dashboard.
+        ◦ Under the Security section, select Credentials.
+    3. Open Global Credentials:
+        ◦ Click on System.
+        ◦ Select Global credentials (unrestricted).
+        ◦ Click on Add Credentials.
+    4. Configure SSH Username with Private Key:
+        ◦ In the Kind dropdown, select SSH Username with private key.
+        ◦ In the ID field, enter: maven-server-cred.
+        ◦ In the Description field, enter: Maven server credentials.
+        ◦ In the Username field, enter: ubuntu.
+    5. Enter Private Key:
+        ◦ Under Private Key, select Enter directly.
+        ◦ Click on Add and paste the private key content in the provided text area.
+    6. Save Credentials:
+        ◦ Click on Create to finalize the setup.
+Your Maven credentials are now successfully configured in Jenkins.
+===============================================================================
+
+Setting Up Maven Node (Build Slave) in Jenkins
+Follow the steps below to set up a Maven node (build slave) from Jenkins Master:
+Prerequisite:
+    • Ensure that credentials for the Jenkins slave have already been added in Jenkins Master.
+Step-by-Step Configuration:
+    1. Access Node Management:
+        ◦ Log in to Jenkins Master.
+        ◦ Click on Manage Jenkins.
+        ◦ Under System Configuration, select Nodes and Clouds.
+    2. Create a New Node:
+        ◦ Click on New Node.
+        ◦ Enter Node Name as: maven-slave.
+        ◦ Select Permanent Agent and click OK.
+    3. Configure Node Details:
+        ◦ Description: Build Java-based application on this slave.
+        ◦ Number of Executors: 3.
+        ◦ Remote Root Directory: /home/ubuntu/jenkins.
+        ◦ Labels: maven.
+        ◦ Usage: Select Use this node as much as possible.
+    4. Setup SSH Connection:
+        ◦ Launch Method: Select Launch agent via SSH.
+        ◦ Host: Enter the private IP of the build slave.
+        ◦ Credentials: Click on the dropdown arrow and select the existing credentials that were previously added.
+    5. Configure Security & Availability:
+        ◦ Host Key Verification Strategy: Select Non verifying Verification Strategy.
+        ◦ Availability: Select Keep this agent online as much as possible.
+    6. Save Configuration:
+        ◦ Click on Save to complete the setup.
+Your Maven build slave is now successfully configured in Jenkins.
+================================================================================
 
 
 
