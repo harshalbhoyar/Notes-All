@@ -851,6 +851,184 @@ Step-by-Step Configuration:
 Your Maven build slave is now successfully configured in Jenkins.
 ================================================================================
 
+Step-by-Step Guide to Creating a Jenkins Pipeline (ttrend-job) and Adding Git Credentials
+Creating a Pipeline in Jenkins
+    1. Open Jenkins and navigate to the Dashboard.
+    2. Click on New Item.
+    3. Enter the name ttrend-job.
+    4. Select Pipeline.
+    5. Click on OK.
+    6. Scroll down to the Pipeline section.
+    7. In the Definition dropdown, select Pipeline script from SCM.
+    8. In the SCM dropdown, choose Git.
+    9. In the Repository URL field, enter:
+       https://github.com/harshalbhoyar/tweet-trend-new.git
+    10. Under Credentials, select your saved credentials (e.g., harshalbhoyar).
+    11. In Branches to Build, set Branch Specifier as:
+       */main
+    12. In Script Path, enter:
+       Jenkinsfile
+    13. Click on Save.
+    14. Click on Build Now to trigger the pipeline.
+Adding Git Credentials in Jenkins
+    1. Click on Manage Jenkins from the dashboard.
+    2. Navigate to Credentials > System > Global Credentials.
+    3. Click on Add Credentials.
+    4. In the Kind dropdown, select Username with Password.
+    5. Enter the following details:
+        ◦ Username: Your GitHub username
+        ◦ Password: Your Personal Access Token (generated from GitHub)
+        ◦ ID: Enter Github_Cred
+    6. Click on Create.
+Updating Jenkinsfile
+Update the Jenkinsfile with the following content:
+pipeline{
+    agent{
+        node{
+            label 'maven'
+        }
+    }
+    environment{
+        MAVEN_HOME = '/opt/apache-maven-3.9.9'
+        PATH = "$MAVEN_HOME/bin:$PATH"
+    }   
+    stages{
+        stage('build'){
+            steps{
+                echo "----------- build started ----------"
+                sh 'mvn clean deploy -Dmaven.test.skip=true'
+                echo "----------- build completed ----------"
+            }
+        }
+    }
+}
+Now, your ttrend-job pipeline is configured in Jenkins and ready to build automatically using GitHub repository updates.
+
+==========================================================================================================================================
+Process to Create Multi-Branch Pipeline in Jenkins (ttrend-multibranch)
+
+Step 1: Create a New Item
+
+Open Jenkins and click on New Item.
+
+In the Enter an item name field, type ttrend-multibranch.
+
+Scroll down and select Multibranch Pipeline.
+
+Click OK to proceed.
+
+Step 2: Configure General Settings
+
+Under the General section, provide a Display Name as ttrend multibranch.
+
+Step 3: Configure Branch Sources
+
+Scroll down to Branch Sources.
+
+Click on Add Source.
+
+Click on the dropdown arrow and select Git.
+
+In the Repository URL field, provide the Git repository URL, e.g.,
+
+https://github.com/harshalbhoyar/tweet-trend-new.git
+
+Under Credentials:
+
+Click on Add.
+
+Select and provide the existing credentials that are already added.
+
+Example: harshalbhoyar.
+
+Step 4: Configure Build Settings
+
+Under Build Configuration, set:
+
+Mode: Keep default.
+
+Script Path: Jenkinsfile
+
+Click Save.
+
+Jenkins will now automatically scan the multibranch pipeline logs.
+
+Step 5: Create and Scan a New Branch
+
+Create a new branch in the repository named dev.
+
+In ttrend-multibranch, click on Scan Multibranch Pipeline.
+
+Jenkins will automatically detect the dev branch and start building.
+
+The dev branch will be visible along with the build logs.
+
+Summary
+
+Following these steps ensures the successful setup of a Multi-Branch Pipeline in Jenkins, automatically detecting and building new branches based on the repository structure.
+
+=============================================================================================================================================================
+
+Setting Up GitHub Webhook in Jenkins
+
+Step 1: Install Required Plugin
+
+Navigate to the Jenkins Dashboard.
+
+Click on Manage Jenkins > Manage Plugins.
+
+Go to the Available Plugins tab.
+
+In the search bar, type Multibranch Scan Webhook Trigger.
+
+Select the Multibranch Scan Webhook Trigger plugin and click Install without restart.
+
+Step 2: Configure the Multibranch Pipeline
+
+Return to the Jenkins Dashboard.
+
+Open the desired Multibranch Pipeline project (e.g., ttrend-multibranch).
+
+Click on Configure.
+
+Scroll down to Scan Multibranch Pipeline Triggers.
+
+Check the option Scan by Webhook.
+
+In the Trigger token field, enter dpp-token.
+
+Click Save.
+
+Step 3: Configure GitHub Webhook
+
+Open your GitHub repository.
+
+Go to Settings > Webhooks.
+
+Click Add webhook.
+
+In the Payload URL field, enter your Jenkins URL with the webhook endpoint:
+
+http://your-jenkins-url/multibranch-webhook-trigger/invoke?token=dpp-token
+
+Set Content type to application/json.
+
+Select the events you want to trigger the webhook (e.g., Push events).
+
+Click Add webhook.
+
+Step 4: Test the Webhook
+
+Make a change in your GitHub repository (e.g., push a new commit).
+
+Check Jenkins to confirm that the pipeline was triggered.
+
+If the webhook does not trigger, verify the Payload URL, token, and network accessibility.
+
+Your Jenkins is now set up to automatically trigger a build whenever changes are pushed to the GitHub repository!
+
+===============================================================================================================================================
+
 
 
 
