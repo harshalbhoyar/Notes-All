@@ -1029,6 +1029,150 @@ Your Jenkins is now set up to automatically trigger a build whenever changes are
 
 ===============================================================================================================================================
 
+AWS certificate :
+https://www.credly.com/badges/1d8aa7bc-aa55-4e80-88a4-a9d45014cc88/linked_in_profile
+
+================================================================================================================================================================================
+
+
+
+EKS Cluster Setup with Fargate Profile and ALB Ingress Controller
+🛠️ Prerequisites
+    • AWS CLI configured
+    • eksctl installed
+    • kubectl installed
+    • IAM permissions to create resources
+    • Ubuntu or similar Linux system
+    • Helm installed (or steps included below)
+
+1. Create an EKS Cluster Using eksctl
+eksctl create cluster \
+  --name demo-cluster-1 \
+  --region us-east-1 \
+  --fargate
+
+✅ This will create a new EKS cluster with Fargate as the compute layer.
+
+2. Update kubeconfig for kubectl access
+
+aws eks update-kubeconfig \
+  --name demo-cluster-1 \
+  --region us-east-1
+
+✅ This command sets up your kubectl context for the new cluster.
+
+3. Create a Fargate Profile (for custom namespace game-2048)
+bash
+CopyEdit
+eksctl create fargateprofile \
+  --cluster demo-cluster-1 \
+  --region us-east-1 \
+  --name alb-sample-app \
+  --namespace game-2048
+✅ Now, anything deployed to the game-2048 namespace will run on Fargate.
+
+4. Deploy Application (2048 Game Example)
+bash
+CopyEdit
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml
+✅ This deploys Deployment, Service, and Ingress resources.
+
+5. Verify Deployment and Service
+Check running Pods:
+bash
+CopyEdit
+kubectl get pods -n game-2048
+kubectl get pods -n game-2048 -w   # Watch mode
+Check Service:
+bash
+CopyEdit
+kubectl get svc -n game-2048
+Check Ingress:
+bash
+CopyEdit
+kubectl get ingress -n game-2048
+
+📦 ALB Controller Setup
+6. Associate IAM OIDC Provider
+bash
+CopyEdit
+eksctl utils associate-iam-oidc-provider \
+  --cluster demo-cluster-1 \
+  --approve
+✅ Enables IAM roles for Kubernetes service accounts.
+
+7. Setup ALB Controller IAM Role
+Step 7.1: Download IAM Policy
+bash
+CopyEdit
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.11.0/docs/install/iam_policy.json
+Step 7.2: Create IAM Policy
+bash
+CopyEdit
+aws iam create-policy \
+  --policy-name AWSLoadBalancerControllerIAMPolicy \
+  --policy-document file://iam_policy.json
+Step 7.3: Create IAM Service Account with Role
+bash
+CopyEdit
+eksctl create iamserviceaccount \
+  --cluster=demo-cluster-1 \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --attach-policy-arn=arn:aws:iam::058264365945:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve
+🔥 Note: Update the account ID 058264365945 with yours if it's different.
+
+8. Install Helm (if not already installed)
+bash
+CopyEdit
+sudo snap install helm --classic
+
+9. Deploy AWS Load Balancer Controller using Helm
+Step 9.1: Add Helm Repo
+bash
+CopyEdit
+helm repo add eks https://aws.github.io/eks-charts
+Step 9.2: Update Helm Repo
+bash
+CopyEdit
+helm repo update eks
+Step 9.3: Install ALB Controller
+bash
+CopyEdit
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system \
+  --set clusterName=demo-cluster-1 \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller \
+  --set region=us-east-1 \
+  --set vpcId=vpc-046d525b2031f9249
+🔥 Note: Replace vpc-046d525b2031f9249 with your actual VPC ID if different.
+
+10. Verify ALB Controller is Running
+bash
+CopyEdit
+kubectl get deployment -n kube-system aws-load-balancer-controller
+kubectl get deployment -n kube-system aws-load-balancer-controller -w   # Watch mode
+kubectl get pods -n kube-system -w
+
+🎯 Final Check
+    • Ingress should automatically create an ALB (Application Load Balancer).
+    • You can access your deployed 2048 game application via the ALB DNS.
+
+
+=============================================================================================================
+
+
+
+
+
+
+
+
+
+
+
 
 
 
